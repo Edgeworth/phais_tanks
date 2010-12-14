@@ -8,7 +8,7 @@ struct Tank {
 };
 
 struct Shell {
-	int sx, sy, x, y, st, t, id;
+	int sx, sy, x, y, st, t;
 };
 
 extern sf::Mutex copyMutex;

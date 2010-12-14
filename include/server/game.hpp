@@ -13,8 +13,8 @@ void run(void*);
 bool startGame();
 void sendClientData();
 void sendObsData();
-void doTanks();
-void doShells();
+void doStart();
+void doEnd();
 void checkWon();
 
 #endif

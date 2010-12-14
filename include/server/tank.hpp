@@ -23,9 +23,9 @@ struct Tank : public Obs {
 };
 
 struct Shell {
-	Shell(int _sx, int _sy, int _x, int _y, int _st, int _t, int _id)
-		: sx(_sx), sy(_sy), x(_x), y(_y), st(_st), t(_t), id(_id) {}
-	int sx, sy, x, y, st, t, id;
+	Shell(int _sx, int _sy, int _x, int _y, int _st, int _t)
+		: sx(_sx), sy(_sy), x(_x), y(_y), st(_st), t(_t) {}
+	int sx, sy, x, y, st, t;
 };
 
 #endif

@@ -37,7 +37,7 @@ void runNet(void* ip) {
 					tanks.back().push_back(tank);
 				} else if (cmd[0] == "SHELL") {
 					Shell shell = {ITOA(cmd[1]), ITOA(cmd[2]), ITOA(cmd[3]),
-						ITOA(cmd[4]), ITOA(cmd[5]), ITOA(cmd[6]), ITOA(cmd[7])};
+						ITOA(cmd[4]), ITOA(cmd[5]), ITOA(cmd[6])};
 					shells.back().push_back(shell);
 				}
 			}

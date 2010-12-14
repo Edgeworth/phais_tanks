@@ -1,12 +1,14 @@
 #include "game.hpp"
+#include <utility>
 #include "utility.hpp"
+
 
 sf::Mutex gMutex;
 std::vector<Tank*> pool, gpool;
 std::vector<Obs> obs;
 std::vector<Shell> shells;
+std::vector<std::pair<int, int> > moves;
 bool ingame = false, running = true;
-int shellId = 1;
 
 void run(void*) {
 	sf::Clock clock;
@@ -21,9 +23,9 @@ void run(void*) {
 		}
 
 		sendClientData();
-		doTanks();
+		doStart();
 		sendObsData();
-		doShells();
+		doEnd();
 		checkWon();
 		if (clock.GetElapsedTime() < 1)
 			sf::Sleep(1-clock.GetElapsedTime());
@@ -32,6 +34,7 @@ void run(void*) {
 
 bool startGame() {
 	gpool.clear();
+	shells.clear();
 	if (pool.size() < 2) return false;
 
 	int id = 1;
@@ -88,9 +91,9 @@ void sendObsData() {
 			}
 
 			for (int j = 0; j < shells.size(); ++j) {
-				//Obs specific format: SHELL sx sy x y st t id
-				obsSend(obs[i], (FMT("SHELL %1% %2% %3% %4% %5% %6% %7%\n")
-					%shells[j].sx%shells[j].sy%shells[j].x%shells[j].y%shells[j].st%shells[j].t%shells[j].id).str());
+				//Obs specific format: SHELL sx sy x y st t
+				obsSend(obs[i], (FMT("SHELL %1% %2% %3% %4% %5% %6%\n")
+					%shells[j].sx%shells[j].sy%shells[j].x%shells[j].y%shells[j].st%shells[j].t).str());
 			}
 			//After data sent, send END
 			obsSend(obs[i], "END\n");
@@ -100,10 +103,12 @@ void sendObsData() {
 	}
 }
 
-void doTanks() {
+void doStart() {
+	moves.resize(gpool.size());
 	for (int i = 0; i < gpool.size(); ++i) {
 		try {
 			LOG("Tank %1%: x:%2% y:%3% hp:%4%",%i%gpool[i]->x%gpool[i]->y%gpool[i]->hp);
+			moves[i] = std::make_pair(gpool[i]->x, gpool[i]->y);
 			if (gpool[i]->hp == 0) continue;
 			obsSend(*gpool[i], "YOURMOVE\n");
 			std::string mStr = obsRecv(*gpool[i]);
@@ -117,14 +122,14 @@ void doTanks() {
 				ty = clamp(ty, -1000, 1000);
 				tt = std::min(10, tt);
 				tt = std::max(1, dist(gpool[i]->x, gpool[i]->y, tx, ty)/400);
-				shells.push_back(Shell(gpool[i]->x, gpool[i]->y, tx, ty, tt, tt, ++shellId));
+				shells.push_back(Shell(gpool[i]->x, gpool[i]->y, tx, ty, tt, tt));
 				gpool[i]->stam--;
 			}
 
 			if ((vx||vy) && gpool[i]->stam > 0) {
 				float fac = 100.0/dist(0, 0, vx, vy);
-				gpool[i]->x = clamp(gpool[i]->x+fac*vx, -1000, 1000);
-				gpool[i]->y = clamp(gpool[i]->y+fac*vy, -1000, 1000);
+				moves[i].first = clamp(gpool[i]->x+fac*vx, -1000, 1000);
+				moves[i].second = clamp(gpool[i]->y+fac*vy, -1000, 1000);
 				gpool[i]->stam--;
 			}
 
@@ -136,7 +141,11 @@ void doTanks() {
 	}
 }
 
-void doShells() {
+void doEnd() {
+	for (int i = 0; i < gpool.size(); ++i) {
+		gpool[i]->x = moves[i].first;
+		gpool[i]->y = moves[i].second;
+	}
 	for (int i = 0; i < shells.size();) {
 		if (shells[i].t == 0) {
 			shells.erase(shells.begin()+i);
