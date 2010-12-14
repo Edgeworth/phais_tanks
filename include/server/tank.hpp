@@ -18,15 +18,14 @@ struct Tank : public Obs {
 		stam = 1;
 	}
 
-	int x, y, hp, stam;
+	int x, y, hp, stam, r, g, b, id;
 	std::string name;
-	int r, g, b, id;
 };
 
 struct Shell {
-	Shell(int _sx, int _sy, int _x, int _y, int _st, int _t)
-		: sx(_sx), sy(_sy), x(_x), y(_y), st(_st), t(_t) {}
-	int sx, sy, x, y, st, t;
+	Shell(int _sx, int _sy, int _x, int _y, int _st, int _t, int _id)
+		: sx(_sx), sy(_sy), x(_x), y(_y), st(_st), t(_t), id(_id) {}
+	int sx, sy, x, y, st, t, id;
 };
 
 #endif

@@ -20,9 +20,9 @@ void addClients(void*) {
 			else if (reply[0] == "NAME") {
 				Tank* k = new Tank(o);
 				k->name = reply[1];
-				k->r = LC<int>(reply[2]);
-				k->g = LC<int>(reply[3]);
-				k->b = LC<int>(reply[4]);
+				k->r = ITOA(reply[2]);
+				k->g = ITOA(reply[3]);
+				k->b = ITOA(reply[4]);
 				addClient(k);
 			}
 		} catch (const std::exception& e) {
@@ -33,6 +33,7 @@ void addClients(void*) {
 
 void addClient(Tank* k) {
 	sf::Lock lock(gMutex);
+	LOG("Adding client %1%",%k->ip);
 	pool.push_back(k);
 }
 
@@ -52,6 +53,7 @@ void deleteClient(int i) {
 
 void addObs(const Obs& s) {
 	sf::Lock lock(gMutex);
+	LOG("Adding obs %1%",%s.ip);
 	obs.push_back(s);
 }
 void deleteObs(int i) {

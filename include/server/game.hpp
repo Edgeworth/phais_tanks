@@ -1,6 +1,7 @@
 #ifndef GAME_HPP_
 #define GAME_HPP_
 #include "common.hpp"
+#include "tank.hpp"
 
 extern sf::Mutex gMutex;
 extern std::vector<Tank*> pool, gpool;

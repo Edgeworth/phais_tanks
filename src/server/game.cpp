@@ -6,6 +6,7 @@ std::vector<Tank*> pool, gpool;
 std::vector<Obs> obs;
 std::vector<Shell> shells;
 bool ingame = false, running = true;
+int shellId = 1;
 
 void run(void*) {
 	sf::Clock clock;
@@ -20,8 +21,8 @@ void run(void*) {
 		}
 
 		sendClientData();
-		sendObsData();
 		doTanks();
+		sendObsData();
 		doShells();
 		checkWon();
 		if (clock.GetElapsedTime() < 1)
@@ -46,12 +47,11 @@ bool startGame() {
 		}
 		gpool.push_back(pool[i]);
 	}
-
 	for (int i = 0; i < obs.size(); ++i)
 		try {
-			obsSend(obs[i], (FMT("NEWGAME %1%\n")%gpool.size()).str());
+			obsSend(obs[i], "NEWGAME\n");
 		} catch (const std::exception& e) {
-			LOG("On newgame, obs %1% error:%2%",%obs[i].ip%e.what());
+			LOG("startGame: Obs %1% error: %2%",%obs[i].ip%e.what());
 		}
 	ingame = true;
 	return true;
@@ -88,10 +88,12 @@ void sendObsData() {
 			}
 
 			for (int j = 0; j < shells.size(); ++j) {
-				//Obs specific format: SHELL sx sy x y st t
-				obsSend(obs[i], (FMT("SHELL %1% %2% %3% %4% %5% %6%\n")
-					%shells[j].sx%shells[j].sy%shells[j].x%shells[j].y%shells[j].st%shells[j].t).str());
+				//Obs specific format: SHELL sx sy x y st t id
+				obsSend(obs[i], (FMT("SHELL %1% %2% %3% %4% %5% %6% %7%\n")
+					%shells[j].sx%shells[j].sy%shells[j].x%shells[j].y%shells[j].st%shells[j].t%shells[j].id).str());
 			}
+			//After data sent, send END
+			obsSend(obs[i], "END\n");
 		} catch (const std::exception& e) {
 			LOG("sendObsData: Obs %1% error: %2%",%obs[i].ip%e.what());
 		}
@@ -107,13 +109,15 @@ void doTanks() {
 			std::string mStr = obsRecv(*gpool[i]);
 
 			std::vector<std::string> move = split(mStr, " ");
-			int vx = LC<int>(move[1]), vy = LC<int>(move[2]);
-			int tx = LC<int>(move[3]), ty = LC<int>(move[4]), tt = LC<int>(move[5]);
+			int vx = ITOA(move[1]), vy = ITOA(move[2]);
+			int tx = ITOA(move[3]), ty = ITOA(move[4]), tt = ITOA(move[5]);
 
 			if (tt && gpool[i]->stam > 0) {
+				tx = clamp(tx, -1000, 1000);
+				ty = clamp(ty, -1000, 1000);
 				tt = std::min(10, tt);
 				tt = std::max(1, dist(gpool[i]->x, gpool[i]->y, tx, ty)/400);
-				shells.push_back(Shell(gpool[i]->x, gpool[i]->y, tx, ty, tt, tt));
+				shells.push_back(Shell(gpool[i]->x, gpool[i]->y, tx, ty, tt, tt, ++shellId));
 				gpool[i]->stam--;
 			}
 
@@ -160,12 +164,6 @@ void checkWon() {
 			obsSend(*gpool[i], "GAMEOVER Goodbye, you suck\n");
 		} catch (const std::exception& e) {
 			LOG("checkWon: Client %1% error: %2%",%gpool[i]->ip%e.what());
-		}
-	for (int i = 0; i < obs.size(); ++i)
-		try {
-			obsSend(obs[i], "GAMEOVER Goodbye, you suck\n");
-		} catch (const std::exception& e) {
-			LOG("checkWon: Obs %1% error: %2%",%gpool[i]->ip%e.what());
 		}
 	ingame = false;
 }

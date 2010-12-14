@@ -78,7 +78,6 @@ void client_your_turn() {
 			if ((mx || my) && players[0].stam <= 1) shoot = 0;
 			double vadj = dist(players[0].x, players[0].y, players[i].x, players[i].y)/400.0;
 			int sx = players[i].x+(rand()%100 - 50)+int(vadj*players[i].vx), sy = players[i].y+(rand()%100 - 50)+int(vadj*players[i].vy);
-		 	printf("player:%d sx:%d sy:%d\n", i, sx, sy);
 		 	move(mx, my, sx, sy, shoot);
 		 	break;
 		 }
@@ -95,11 +94,11 @@ void client_your_turn() {
 }
 
 void client_tank_location(int id, int x, int y, int hp, int stamina) {
-	printf("Player %d: x:%d y:%d hp:%d\n", id, x, y, hp);
   players[id] = Player(x, y, hp, stamina, x-players[id].x, y-players[id].y);
 }
 
 void client_shell_launched(int x, int y, int t) {
+	printf("Shell: %d %d %d\n", x, y, t);
 	arrows.push_back(Arrow(x, y, t));
 }
 
