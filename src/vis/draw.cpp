@@ -54,7 +54,7 @@ void drawShells(float alpha) {
 	for (int i = 0; i < start.size(); ++i) {
 		if (start[i].t == 0) {
 			if (alpha < 0.2)
-				window.Draw(sf::Shape::Circle(start[i].x, start[i].y, 100, sf::Color(40, 40, 150, 150)));
+				window.Draw(sf::Shape::Circle(start[i].x, start[i].y, 50, sf::Color(40, 40, 150, 150)));
 			continue;
 		}
 		int x = start[i].sx+(start[i].x-start[i].sx)*(1-(start[i].t-alpha)/(start[i].st));

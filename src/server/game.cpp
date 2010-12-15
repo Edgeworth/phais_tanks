@@ -9,6 +9,7 @@ std::vector<Obs> obs;
 std::vector<Shell> shells;
 std::vector<std::pair<int, int> > moves;
 bool ingame = false, running = true;
+int god = 0;
 
 void run(void*) {
 	sf::Clock clock;
@@ -145,6 +146,14 @@ void doEnd() {
 	for (int i = 0; i < gpool.size(); ++i) {
 		gpool[i]->x = moves[i].first;
 		gpool[i]->y = moves[i].second;
+	}
+	++god;
+	if (god == 20) {
+		god = 0;
+		for (int i = 0; i < gpool.size(); ++i) {
+			if (gpool[i]->hp == 0) continue;
+			shells.push_back(Shell(gpool[i]->x, gpool[i]->y, gpool[i]->x, gpool[i]->y, 1, 1));
+		}
 	}
 	for (int i = 0; i < shells.size();) {
 		if (shells[i].t == 0) {
