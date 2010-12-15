@@ -2,17 +2,17 @@
 #include "net.hpp"
 
 sf::RenderWindow window;
+sf::Font font;
 int state = 0;
 
 void draw(sf::RenderWindow& window, sf::Clock& clock) {
 	sf::Lock lock(copyMutex);
 	float alpha = clock.GetElapsedTime();
-	if (alpha > 1.0 || state+2 > copyTanks.size() || state+2 > copyShells.size()) {
-		if (alpha > 1.0) ++state;
+	if (alpha > 1.0 || state+1 >= copyTanks.size()) {
+		if (state+1 < copyTanks.size()) ++state;
 		clock.Reset();
 		return;
 	}
-
 	window.Clear(sf::Color(255, 255, 255));
 	for (int x = -10; x <= 10; ++x)
 		window.Draw(sf::Shape::Line(x*100, -1000, x*100, 1000, 6, sf::Color(200, 200, 200)));
@@ -39,8 +39,13 @@ void drawTanks(float alpha) {
 		if (start[i].hp == 0)
 			color = sf::Color(0, 0, 0);
 		window.Draw(sf::Shape::Circle(x, y, 50, color, 5));
-	window.Draw(sf::Shape::Rectangle(x-50, y-10, x+50, y+10, sf::Color(200, 40, 40), 2));
-	window.Draw(sf::Shape::Rectangle(x-50, y-10, x+(start[i].hp-50), y+10, sf::Color(40, 200, 40), 2));
+		window.Draw(sf::Shape::Rectangle(x-50, y-10, x+50, y+10, sf::Color(200, 40, 40), 2));
+		window.Draw(sf::Shape::Rectangle(x-50, y-10, x+(start[i].hp-50), y+10, sf::Color(40, 200, 40), 2));
+		sf::String name(start[i].name, font);
+		name.SetColor(sf::Color(0, 0, 0));
+		name.Move(x, y+60);
+		window.Draw(name);
+
 	}
 }
 

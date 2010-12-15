@@ -12,7 +12,8 @@ int main(int argc, char *argv[]) {
 	net.Launch();
 
 	window.Create(sf::VideoMode(800, 800), "Tanks",
-		sf::Style::Resize|sf::Style::Close, sf::WindowSettings(24, 8, 16));
+	sf::Style::Resize|sf::Style::Close, sf::WindowSettings(24, 8, 16));
+	font.LoadFromFile("emulogic.ttf");
 	window.UseVerticalSync(true);
 	sf::View view(sf::FloatRect(-1100, -1100, 1100, 1100));
 	window.SetView(view);

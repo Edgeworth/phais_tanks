@@ -3,6 +3,7 @@
 #include "common.hpp"
 
 extern sf::RenderWindow window;
+extern sf::Font font;
 extern int state;
 
 void draw(sf::RenderWindow& window, sf::Clock& clock);

@@ -167,6 +167,7 @@ void checkWon() {
 	for (int i = 0; i < gpool.size(); ++i)
 		if (gpool[i]->hp > 0) alive++;
 	if (alive > 1) return;
+	sendObsData(); //Send obs snapshot at the end of the game
 
 	for (int i = 0; i < gpool.size(); ++i)
 		try {
@@ -174,5 +175,12 @@ void checkWon() {
 		} catch (const std::exception& e) {
 			LOG("checkWon: Client %1% error: %2%",%gpool[i]->ip%e.what());
 		}
+	for (int i = 0; i < obs.size(); ++i)
+		try {
+			obsSend(obs[i], "GAMEOVER\n");
+		} catch (const std::exception& e) {
+			LOG("checkWon: Obs %1% error: %2%",%obs[i].ip%e.what());
+		}
 	ingame = false;
+	sf::Sleep(5); //Wait for obs and clients to catch up
 }

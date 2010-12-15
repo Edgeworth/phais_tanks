@@ -2,7 +2,7 @@
 #include "draw.hpp"
 
 sf::Mutex copyMutex;
-bool running = true, gameover = false;
+bool running = true;
 std::vector<std::vector<Tank> > tanks, copyTanks;
 std::vector<std::vector<Shell> > shells, copyShells;
 
@@ -26,6 +26,9 @@ void runNet(void* ip) {
 					copyShells = shells;
 					tanks.push_back(std::vector<Tank>());
 					shells.push_back(std::vector<Shell>());
+				} else if (cmd[0] == "GAMEOVER") {
+					sf::Lock lock(copyMutex);
+					copyTanks.push_back(copyTanks.back()); //So last frame is displayed
 				} else if (cmd[0] == "NEWGAME") {
 					sf::Lock lock(copyMutex);
 					tanks.clear(); tanks.resize(1); copyTanks.clear();
